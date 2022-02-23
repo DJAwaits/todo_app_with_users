@@ -1,9 +1,17 @@
 const {User} = require('../models');
 const md5 = require('md5');
+const passport = require('passport');
 
 module.exports.renderRegistration = function(req, res){
     res.render('users/register');
 };
+
+function addUserToViews(req, res, next){
+    if (req.user){
+        res.locals.user = req.user;
+    }
+    next();
+}
 
 module.exports.register = async function(req,res){
     const existingUser = await User.findOne({
@@ -24,4 +32,23 @@ module.exports.register = async function(req,res){
         });
         res.redirect('/');
     }
+};
+
+module.exports.renderLogin = function(req, res){
+    let error = null
+    if (req.session.messages && req.session.messages.length>0){
+        error = req.session.messages[0];
+    }
+    res.render('users/login', {error});
+};
+
+module.exports.authenticate = passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login',
+    failureMessage: true
+});
+
+module.exports.logout = function(req, res){
+    req.logout();
+    res.redirect('/login');
 };
