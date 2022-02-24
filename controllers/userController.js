@@ -6,12 +6,6 @@ module.exports.renderRegistration = function(req, res){
     res.render('users/register');
 };
 
-function addUserToViews(req, res, next){
-    if (req.user){
-        res.locals.user = req.user;
-    }
-    next();
-}
 
 module.exports.register = async function(req,res){
     const existingUser = await User.findOne({
